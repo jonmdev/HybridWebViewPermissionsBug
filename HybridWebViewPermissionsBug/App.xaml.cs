@@ -1,5 +1,4 @@
-﻿using Java.Lang;
-using Microsoft.Maui.Handlers;
+﻿using Microsoft.Maui.Handlers;
 using Microsoft.Maui.Platform;
 using System.Diagnostics;
 
@@ -21,10 +20,12 @@ namespace HybridWebViewPermissionsBug
                 Debug.WriteLine("PLATFORM VIEW " + platformView.GetType());//Microsoft.Maui.Platform.MauiHybridWebView
                 Debug.WriteLine("HANDLER PLATFORM VIEW " + webView.Handler.PlatformView.GetType()); //Microsoft.Maui.Platform.MauiHybridWebView
                 Debug.WriteLine("HANDLER " + webView.Handler.GetType());//Microsoft.Maui.Handlers.HybridWebViewHandler
-                var webViewHandler = (IWebViewHandler)webView.Handler;
-                Debug.Assert(webViewHandler != null, "Value must not be null.");
-                var chromeClient = new MauiAppWebViewHandlers.Platforms.Android.MyWebChromeClient(webViewHandler);
-                webViewHandler.PlatformView.SetWebChromeClient(chromeClient);
+                //var webViewHandler = (IWebViewHandler)webView.Handler; //doesn't work
+                IWebViewHandler fakeHandler = new WebViewHandler(); // make fake handler to satisfy base WebChromeClient constructor
+                HybridWebViewHandler realHandler = webView.Handler as HybridWebViewHandler;
+                Debug.Assert(realHandler != null, "Real Handler must not be null.");
+                var chromeClient = new MyWebChromeClient(fakeHandler, realHandler);
+                realHandler.PlatformView.SetWebChromeClient(chromeClient); 
             };
 
 
